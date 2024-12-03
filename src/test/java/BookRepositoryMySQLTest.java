@@ -30,6 +30,8 @@ public class BookRepositoryMySQLTest {
                 .setTitle("Ion")
                 .setAuthor("Liviu Rebreanu")
                 .setPublishedDate(LocalDate.of(1910, 10, 20))
+                .setStock(20)
+                .setPrice(15)
                 .build();
 
         assertTrue(bookRepository.save(book), "Expected book to be saved successfully");
@@ -42,6 +44,8 @@ public class BookRepositoryMySQLTest {
                 .setTitle("Ion")
                 .setAuthor("Liviu Rebreanu")
                 .setPublishedDate(LocalDate.of(1910, 10, 20))
+                .setStock(20)
+                .setPrice(15)
                 .build());
 
         List<Book> books = bookRepository.findAll();
@@ -55,6 +59,8 @@ public class BookRepositoryMySQLTest {
                 .setTitle("Ion")
                 .setAuthor("Liviu Rebreanu")
                 .setPublishedDate(LocalDate.of(1910, 10, 20))
+                .setStock(20)
+                .setPrice(15)
                 .build();
 
         bookRepository.save(book);
@@ -74,6 +80,8 @@ public class BookRepositoryMySQLTest {
                 .setTitle("Ion")
                 .setAuthor("Liviu Rebreanu")
                 .setPublishedDate(LocalDate.of(1910, 10, 20))
+                .setStock(20)
+                .setPrice(15)
                 .build();
 
         bookRepository.save(book);
@@ -86,6 +94,8 @@ public class BookRepositoryMySQLTest {
                 .setTitle("Ion")
                 .setAuthor("Liviu Rebreanu")
                 .setPublishedDate(LocalDate.of(1910, 10, 20))
+                .setStock(20)
+                .setPrice(15)
                 .build());
 
         bookRepository.removeAll();

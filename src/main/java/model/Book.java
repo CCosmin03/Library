@@ -7,6 +7,24 @@ public class Book {
     private String title;
     private String author;
     private LocalDate publishedDate;
+    private Double price;
+    private Integer stock;
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
 
     public Long getId() {
         return id;
@@ -41,6 +59,6 @@ public class Book {
     }
     @Override
     public String toString(){
-        return "ID: " + id + "\nTitle: " + title + "\nAuthor: " + author + "\nPublished Date: " + publishedDate + "\n";
+        return "ID: " + id + "\nTitle: " + title + "\nAuthor: " + author + "\nPublished Date: " + publishedDate + "Stock: " + stock + "Price: " + price + "\n";
     }
 }

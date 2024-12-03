@@ -1,11 +1,6 @@
 package database;
 
-import static database.Constants.Tables.BOOK;
-import static database.Constants.Tables.RIGHT;
-import static database.Constants.Tables.ROLE;
-import static database.Constants.Tables.ROLE_RIGHT;
-import static database.Constants.Tables.USER;
-import static database.Constants.Tables.USER_ROLE;
+import static database.Constants.Tables.*;
 
 public class SQLTableCreationFactory {
 
@@ -16,6 +11,8 @@ public class SQLTableCreationFactory {
                     "  author varchar(500) NOT NULL," +
                     "  title varchar(500) NOT NULL," +
                     "  publishedDate datetime DEFAULT NULL," +
+                    "  stock INT NOT NULL DEFAULT 0," +
+                    "  price DOUBLE NOT NULL DEFAULT 0.0," +
                     "  PRIMARY KEY (id)," +
                     "  UNIQUE KEY id_UNIQUE (id)" +
                     ") ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;";
@@ -74,6 +71,21 @@ public class SQLTableCreationFactory {
                     "    REFERENCES role (id)" +
                     "    ON DELETE CASCADE" +
                     "    ON UPDATE CASCADE);";
+            case ORDER -> "CREATE TABLE IF NOT EXISTS `order` (" +
+                    "  id INT(11) NOT NULL AUTO_INCREMENT," +
+                    "  book_id INT(11)," +           // Matches book.id
+                    "  user_id INT(11)," +              // Matches user.id
+                    "  quantity INT NOT NULL," +
+                    "  total_price DOUBLE NOT NULL," +
+                    "  order_date DATETIME DEFAULT CURRENT_TIMESTAMP," +
+                    "  PRIMARY KEY (id)," +
+                    "  UNIQUE INDEX id_UNIQUE (id ASC)," +   // Unique index on the primary key
+                    "  INDEX book_id_idx (book_id ASC)," +   // Index for book_id foreign key
+                    "  INDEX user_id_idx (user_id ASC)," +   // Index for user_id foreign key
+                    "  CONSTRAINT booko_fkid FOREIGN KEY (book_id) REFERENCES book (id) " +
+                    "    ON DELETE SET NULL," +
+                    "  CONSTRAINT usero_fkid FOREIGN KEY (user_id) REFERENCES user (id) " +
+                    "    ON DELETE SET NULL);";
             default -> "";
         };
     }

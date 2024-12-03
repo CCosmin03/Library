@@ -6,6 +6,7 @@ import repository.book.BookRepository;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 public class BookServiceImpl implements BookService{
     private final BookRepository bookRepository;
@@ -38,4 +39,17 @@ public class BookServiceImpl implements BookService{
         LocalDate now=LocalDate.now();
         return (int) ChronoUnit.YEARS.between(book.getPublishedDate(),now);
     }
+    @Override
+    public boolean updateStock(Book book, int newStock) {
+        if (newStock < 0) {
+            throw new IllegalArgumentException("Stock cannot be negative");
+        }
+
+        return bookRepository.updateStock(book, newStock);
+    }
+    @Override
+    public Optional<Book> findByTitleAuthorPublishedDate(String title, String author, LocalDate publishedDate) {
+        return bookRepository.findByTitleAuthorPublishedDate(title, author, publishedDate);
+    }
+
 }
