@@ -16,7 +16,7 @@ public class JDBCConnectionWrapper {
         try{
             Class.forName(JDBC_Driver);
             connection= DriverManager.getConnection(DB_URL+schema+"?allowMultiQueries=true",USER,PASSWORD);
-            createTables();
+            //createTables();
         }catch (ClassNotFoundException e){
             e.printStackTrace();
         }catch (SQLException e){

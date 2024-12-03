@@ -34,6 +34,8 @@ public class BookRepositoryMockTest {
                 .setTitle("Ion")
                 .setAuthor("Liviu Rebreanu")
                 .setPublishedDate(LocalDate.of(1910,10,20))
+                .setStock(20)
+                .setPrice(15)
                 .build()));
     }
 
