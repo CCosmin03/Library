@@ -120,7 +120,7 @@ public class BookController {
                         bookView.addDisplayAlertMessage("Successfully sold book","Book sold","Book was successfully sold from the library!");
 
                         Optional<Book> updatedBook = bookService.findByTitleAuthorPublishedDate(bookDTO.getTitle(), bookDTO.getAuthor(), bookDTO.getPublishedDate());
-                        updatedBook.ifPresent(book -> orderService.save(new Order(null, loggedUser.getId(), book.getId(), LocalDateTime.now(), book.getPrice(), book.getStock())));
+                        updatedBook.ifPresent(book -> orderService.save(new Order(null, loggedUser.getId(), book.getId(), LocalDateTime.now(), book.getPrice(), 1)));
                     } else {
                         bookView.addDisplayAlertMessage("Selling error", "Problem at selling book", "There was a problem selling the selected book from the library!");
                     }

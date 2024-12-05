@@ -1,6 +1,7 @@
 package repository.user;
 
 import database.Constants;
+import model.Book;
 import model.User;
 import model.builder.UserBuilder;
 import model.validator.Notification;
@@ -8,6 +9,7 @@ import repository.security.RightsRolesRepository;
 
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static database.Constants.Tables.USER;
@@ -19,11 +21,30 @@ public class UserRepositoryMySQL implements UserRepository{
         this.connection=connection;
         this.rightsRolesRepository=rightsRolesRepository;
     }
+    private User getUserFromResultSet(ResultSet resultSet) throws SQLException {
+        return new UserBuilder()
+                .setId(resultSet.getLong("id"))
+                .setUsername(resultSet.getString("username"))
+                .setPassword(resultSet.getString("password"))
+                .setRoles(rightsRolesRepository.findRolesForUser(resultSet.getLong("id")))
+                .build();
+    }
     @Override
     public List<User> findAll() {
-        return null;
+        String sql="SELECT * FROM user;";
+        List<User> users=new ArrayList<>();
+        try{
+            Statement statement=connection.createStatement();
+            ResultSet resultSet=statement.executeQuery(sql);
+            while(resultSet.next()){
+                users.add(getUserFromResultSet(resultSet));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return users;
     }
-   //de facut cu prepared statement
    @Override
    public Notification<User> findByUsernameAndPassword(String username, String password) {
        Notification<User> findByUsernameAndPasswordNotification = new Notification<>();
