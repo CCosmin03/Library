@@ -1,7 +1,6 @@
 package repository.security;
 
-import com.mysql.cj.x.protobuf.MysqlxPrepare;
-import database.Constants;
+
 import model.Right;
 import model.Role;
 import model.User;
@@ -57,19 +56,31 @@ public class RightsRolesRepositoryMySQL implements RightsRolesRepository  {
 
     @Override
     public Role findRoleById(Long roleId) {
-        Statement statement;
-        try{
-            statement = connection.createStatement();
-            String fetchRoleSql="SELECT * FROM "+ROLE+" WHERE 'id'=\'"+roleId+"\'";
-            ResultSet roleResultSet=statement.executeQuery(fetchRoleSql);
-            roleResultSet.next();
-            String roleTitle=roleResultSet.getString("role");
-            return new Role(roleId, roleTitle, null);
-        } catch (SQLException e){
+        String query = "SELECT * FROM " +ROLE + " WHERE id = ?";
+        System.out.println("Debug: Executing SQL to fetch role by ID: " + query + " with roleId = " + roleId);
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, roleId);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    Role role = new Role(
+                            rs.getLong("id"),
+                            rs.getString("role"),
+                            null
+                    );
+                    System.out.println("Debug: Successfully fetched role - ID: " + role.getId() + ", Role: " + role.getRole());
+                    return role;
+                } else {
+                    System.out.println("Debug: No role found with ID " + roleId);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error while fetching role with ID " + roleId + ": " + e.getMessage());
             e.printStackTrace();
         }
         return null;
     }
+
 
     @Override
     public Right findRightByTitle(String right) {
@@ -90,36 +101,58 @@ public class RightsRolesRepositoryMySQL implements RightsRolesRepository  {
 
     @Override
     public void addRolesToUser(User user, List<Role> roles) {
-        try {
-            for (Role role : roles){
-                PreparedStatement insertUserRoleStatement=connection.prepareStatement("INSERT INTO 'user_role' values (null, ?, ?)");
-                insertUserRoleStatement.setLong(1,user.getId());
-                insertUserRoleStatement.setLong(2,role.getId());
-                insertUserRoleStatement.executeUpdate();
+        String sql = "INSERT INTO user_role (user_id, role_id) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (Role role : roles) {
+                System.out.println("Debug: Assigning Role ID = " + role.getId() + " to User ID = " + user.getId());
+                statement.setLong(1, user.getId());
+                statement.setLong(2, role.getId());
+                statement.addBatch();
             }
-        }catch (SQLException e){
-
+            statement.executeBatch();
+            System.out.println("Debug: Roles successfully assigned to user with ID = " + user.getId());
+        } catch (SQLException e) {
+            System.err.println("Error while assigning roles to user ID " + user.getId() + ": " + e.getMessage());
+            e.printStackTrace();
         }
-
     }
+
 
     @Override
     public List<Role> findRolesForUser(Long userId) {
         try {
-            List<Role> roles=new ArrayList<>();
-            Statement statement=connection.createStatement();
-            String fetchRoleSql="SELECT * FROM "+USER_ROLE+" WHERE 'user_id'=\'"+userId+"\'";
-            ResultSet userRoleResultSet= statement.executeQuery(fetchRoleSql);
-            while (userRoleResultSet.next()){
-                long roleId=userRoleResultSet.getLong("role_id");
-                roles.add(findRoleById(roleId));
-            }
-            return roles;
-        }catch (SQLException e){
+            List<Role> roles = new ArrayList<>();
+            Statement statement = connection.createStatement();
 
+            // Log the query to fetch roles
+            String fetchRoleSql = "SELECT * FROM " + USER_ROLE + " WHERE user_id = " + userId;
+            System.out.println("Debug: Executing SQL to fetch roles: " + fetchRoleSql);
+
+            ResultSet userRoleResultSet = statement.executeQuery(fetchRoleSql);
+
+            // Iterate through the result set
+            while (userRoleResultSet.next()) {
+                long roleId = userRoleResultSet.getLong("role_id");
+                System.out.println("Debug: Found role ID: " + roleId);
+
+                Role role = findRoleById(roleId); // Fetch the role by ID
+                if (role != null) {
+                    System.out.println("Debug: Role details fetched - ID: " + role.getId() + ", Role: " + role.getRole());
+                    roles.add(role);
+                } else {
+                    System.out.println("Debug: Role with ID " + roleId + " not found.");
+                }
+            }
+
+            System.out.println("Debug: Total roles fetched for user ID " + userId + ": " + roles.size());
+            return roles;
+        } catch (SQLException e) {
+            System.err.println("Error while fetching roles for user ID " + userId + ": " + e.getMessage());
+            e.printStackTrace();
         }
-        return null;
+        return null; // Return null in case of an error
     }
+
 
     @Override
     public void addRoleRight(Long roleId, Long rightId) {
